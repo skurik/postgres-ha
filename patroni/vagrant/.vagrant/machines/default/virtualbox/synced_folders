@@ -1,1 +1,0 @@
-{"virtualbox":{"/srv/salt":{"guestpath":"/srv/salt","hostpath":"C:/devel/postgres-ha/patroni/vagrant/salt/roots","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"C:/devel/postgres-ha/patroni/vagrant","disabled":false,"__vagrantfile":true}}}
