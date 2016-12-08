@@ -1,0 +1,1 @@
+A playground for evaluating PostgreSQL HA setups.
