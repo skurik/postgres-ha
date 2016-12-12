@@ -19,10 +19,7 @@ iqube_admin:
     - encrypted: True
     - require:
       - pkg: postgresql
-      - file: salt_pg_bin_dir_config
-  file.managed:
-    - name: "/etc/postgresql/9.6/main/test.cfg"
-    - contents: "test"
+      - file: salt_pg_bin_dir_config  
 
 iqube_admin_access_remove_default:
   file.replace:
