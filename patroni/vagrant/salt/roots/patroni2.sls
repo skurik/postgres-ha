@@ -10,6 +10,6 @@ patroni_repo:
 
 modify_node_config:
   yaml_config.enforce_custom_thing:
-    - name: somename
-    - foo: Foo
-    - bar: Bar
+    - name: "/srv/salt/files/patroni/postgres0.yml"
+    - key: Foo
+    - value: Bar

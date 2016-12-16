@@ -1,6 +1,6 @@
 import salt.exceptions
 
-def enforce_custom_thing(name, foo, bar=True):
+def enforce_custom_thing(name, key, value):
     '''
     Enforce the state of a custom thing
 
@@ -21,18 +21,18 @@ def enforce_custom_thing(name, foo, bar=True):
         'result': True,
         'comment': '',
         'pchanges': {},
-        }
+    }
 
     # Start with basic error-checking. Do all the passed parameters make sense
     # and agree with each-other?
-    if bar == True and foo.startswith('Foo'):
-        raise salt.exceptions.SaltInvocationError(
-            'Argument "foo" cannot start with "Foo" if argument "bar" is True.')
+    # if bar == True and foo.startswith('Foo'):
+    #     raise salt.exceptions.SaltInvocationError(
+    #         'Argument "foo" cannot start with "Foo" if argument "bar" is True.')
 
     
 
     # Check the current state of the system. Does anything need to change?
-    # current_state = __salt__['my_custom_module.current_state'](name)
+    current_state = __salt__['yaml.load_yaml'](name)
 
     # if current_state == foo:
     #     ret['result'] = True
