@@ -9,7 +9,8 @@ patroni_repo:
       - pkg: etcd
 
 modify_node_config:
-  yaml_config.enforce_custom_thing:
+  yaml_config.set_value:
     - name: "/srv/salt/files/patroni/postgres0.yml"
-    - key: Foo
-    - value: Bar
+    - key: "postgresql/bin_dir"
+    # - key: "name"
+    - value: "/usr/lib/postgresql/9.6/bin"

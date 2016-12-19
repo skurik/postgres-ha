@@ -1,20 +1,17 @@
 import salt.exceptions
 
-def enforce_custom_thing(name, key, value):
+def set_value(name, key, value):
     '''
-    Enforce the state of a custom thing
-
-    This state module does a custom thing. It calls out to the execution module
-    ``my_custom_module`` in order to check the current system and perform any
-    needed changes.
+    Change a value of a key in a YAML document
 
     name
-        The thing to do something to
-    foo
-        A required argument
-    bar : True
-        An argument with a default value
+        The YAML file to modify
+    key
+        The key to modify. Can specify the whole path, with tokens delimited by '/'
+    bar
+        The new value
     '''
+
     ret = {
         'name': name,
         'changes': {},
@@ -23,46 +20,36 @@ def enforce_custom_thing(name, key, value):
         'pchanges': {},
     }
 
-    # Start with basic error-checking. Do all the passed parameters make sense
-    # and agree with each-other?
-    # if bar == True and foo.startswith('Foo'):
-    #     raise salt.exceptions.SaltInvocationError(
-    #         'Argument "foo" cannot start with "Foo" if argument "bar" is True.')
+    current_yaml = __salt__['yaml.load_yaml'](name)
+    current_value = __salt__['yaml.get_value'](current_yaml, key)
 
+    if current_value == value:
+        ret['result'] = True
+        ret['comment'] = 'The key \'' + key + '\' already has the value \'' + value + '\''
+        return ret
+
+    if __opts__['test'] == True:
+        ret['comment'] = 'The value of \'' + key + '\' will be changed'
+        ret['pchanges'] = {
+            'old': current_value,
+            'new': value,
+        }
+        
+        ret['result'] = None
+
+        return ret
     
+    new_state = __salt__['yaml.modify_yaml'](current_yaml, key, value)
 
-    # Check the current state of the system. Does anything need to change?
-    current_state = __salt__['yaml.load_yaml'](name)
+    __salt__['yaml.save_yaml'](current_yaml, name)
 
-    # if current_state == foo:
-    #     ret['result'] = True
-    #     ret['comment'] = 'System already in the correct state'
-    #     return ret
+    ret['comment'] = 'The state of "{0}" was changed!'.format(name)
 
-    # # The state of the system does need to be changed. Check if we're running
-    # # in ``test=true`` mode.
-    # if __opts__['test'] == True:
-    #     ret['comment'] = 'The state of "{0}" will be changed.'.format(name)
-    #     ret['pchanges'] = {
-    #         'old': current_state,
-    #         'new': 'Description, diff, whatever of the new state',
-    #     }
+    ret['changes'] = {
+        'old': current_value,
+        'new': value,
+    }
 
-    #     # Return ``None`` when running with ``test=true``.
-    #     ret['result'] = None
-
-    #     return ret
-
-    # # Finally, make the actual change and return the result.
-    # new_state = __salt__['my_custom_module.change_state'](name, foo)
-
-    # ret['comment'] = 'The state of "{0}" was changed!'.format(name)
-
-    # ret['changes'] = {
-    #     'old': current_state,
-    #     'new': new_state,
-    # }
-
-    # ret['result'] = True
+    ret['result'] = True    
 
     return ret
