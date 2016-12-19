@@ -8,8 +8,8 @@ def set_value(name, key, value):
         The YAML file to modify
     key
         The key to modify. Can specify the whole path, with tokens delimited by '/'
-    bar
-        The new value
+    value
+        The new value    
     '''
 
     ret = {
