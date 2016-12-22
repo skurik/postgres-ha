@@ -1,8 +1,15 @@
+{% import 'options.sls' as opts %}
+
 postgresql:
   pkg.installed:
     - name: postgresql-9.6
     - require:
       - cmd: update_apt_sources
+
+tst_file:
+  file.managed:
+    - name: "/tmp/pg_{{ opts.pg_ver }}"
+    - contents: "{{ opts.pg_bin_dir }}"
 
 # This config is a hack to deal with a regression introduced in Salt 2016.11.0 (see e.g. https://github.com/saltstack/salt/issues/38001, https://github.com/saltstack/salt/issues/37935). Should be fixed by https://github.com/saltstack/salt/pull/37993, but as of now, not released yet.
 #
@@ -10,7 +17,7 @@ salt_pg_bin_dir_config:
   file.append:
     - name: "/etc/salt/minion.d/minion.conf"
     - text:
-      - "postgres.bins_dir: '/usr/lib/postgresql/9.6/bin/'"
+      - "postgres.bins_dir: '{{ opts.pg_bin_dir }}'"
 
 iqube_admin:
   postgres_user.present:

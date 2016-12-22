@@ -4,4 +4,4 @@ base:
     - db    
     - basictools
     - dbtools
-    - patroni2
+    - patroni
