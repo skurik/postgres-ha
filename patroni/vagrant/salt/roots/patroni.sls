@@ -1,8 +1,20 @@
 {% import 'options.sls' as opts %}
+{% set nodeIds = [ '0', '1', '2' ] %}
 
 etcd:
   pkg.installed:
     - name: etcd
+
+haproxy:
+  pkg.installed: []
+
+python_etcd:
+  cmd.run:
+    - name: "pip install python-etcd"
+
+python_consul:
+  cmd.run:
+    - name: "pip install python-consul"
 
 patroni_repo:
   cmd.run:
@@ -10,8 +22,32 @@ patroni_repo:
     - require:
       - pkg: etcd
 
-modify_node_config:
+{% for nodeId in nodeIds %}
+modify_node_bin_dir_{{ nodeId }}:
   yaml_config.set_value:
-    - name: "/srv/salt/files/patroni/postgres0.yml"
+    - name: "/root/patroni/postgres{{ nodeId }}.yml"
     - key: "postgresql/bin_dir"    
     - value: "{{ opts.pg_bin_dir }}"
+
+modify_node_datadir_{{ nodeId }}:
+  yaml_config.set_value:
+    - name: "/root/patroni/postgres{{ nodeId }}.yml"
+    - key: "postgresql/data_dir"    
+    - value: "{{ opts.pg_data_dir + '/node' + nodeId }}"
+{% endfor %}
+
+# Toto asi neni nutne: export PATH=$PATH:/usr/lib/postgresql/9.6/bin
+# Misto toho nastavime bin_dir v postgres$i.yml, viz. nize:
+# modify postgres$i.yml:
+  # postgresql/data_dir: /var/lib/postgresql/9.6/node$i
+  # postgresql/bin_dir: /usr/lib/postgresql/9.6/bin
+# run (as 'postgres')
+# ./patroni.py postgres0.yml
+# ./patroni.py postgres1.yml
+# psql -h localhost -p 5432
+# psql -h localhost -p 5433
+# apt-get install haproxy
+# haproxy -f haproxy.cfg
+# psql -h localhost -p 5000
+# su postgres -c "/usr/lib/postgresql/9.6/bin/pg_ctl -D /var/lib/postgresql/9.6/node0 stop -m fast"
+# 
