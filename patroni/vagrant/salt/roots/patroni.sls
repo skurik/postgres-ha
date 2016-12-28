@@ -34,6 +34,16 @@ modify_node_datadir_{{ nodeId }}:
     - name: "/root/patroni/postgres{{ nodeId }}.yml"
     - key: "postgresql/data_dir"    
     - value: "{{ opts.pg_data_dir + '/node' + nodeId }}"
+
+# This does not work as expected. We need to modify the postgres config to log into a file and use the -l parameter to pg_ctl (see http://postgresql.nabble.com/pg-ctl-restart-does-not-terminate-td5932070.html#a5932095)
+#
+run_node_{{ nodeId }}:
+  cmd.run:    
+    - name: "su postgres -c './patroni.py postgres{{ nodeId }}.yml'"
+    - cwd: "/root/patroni"    
+    - require:
+      - yaml_config: modify_node_bin_dir_{{ nodeId }}
+      - yaml_config: modify_node_datadir_{{ nodeId }}
 {% endfor %}
 
 # Toto asi neni nutne: export PATH=$PATH:/usr/lib/postgresql/9.6/bin
