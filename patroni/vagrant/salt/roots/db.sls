@@ -26,7 +26,7 @@ iqube_admin:
     - encrypted: True
     - require:
       - pkg: postgresql
-      - file: salt_pg_bin_dir_config  
+      - file: salt_pg_bin_dir_config
 
 iqube_admin_access_remove_default:
   file.replace:
@@ -99,3 +99,12 @@ pgctl_helper_restart:
     - name: "/usr/local/bin/pg96restart.sh"
     - source: "/srv/salt/files/postgres/pg96restart.sh"
     - mode: 0550
+
+# Uncomment this if we want to keep the default cluster running
+#
+pg_default_cluster_not_running:
+  cmd.run:
+    - require:
+      - pkg: postgresql
+      - file: pgctl_helper_stopfast
+    - name: "/usr/local/bin/pg96stopfast.sh"
